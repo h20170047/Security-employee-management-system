@@ -2,6 +2,7 @@ package com.svj.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -14,30 +15,37 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class EMSUpgradeSecurityConfig {
     @Bean
     public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder){
-        UserDetails user= User.withUsername("Swaraj")
+        UserDetails employee= User.withUsername("Swaraj")
                 .password(passwordEncoder.encode("Pwd1"))
-                .roles("USER").build();
+                .roles("EMPLOYEE").build();
 
-        UserDetails admin= User.withUsername("Ram")
+        UserDetails hr= User.withUsername("Ram")
                 .password(passwordEncoder.encode("Pwd2"))
-                .roles("ADMIN").build();
+                .roles("MANAGER").build();
 
-        UserDetails userAdmin= User.withUsername("Amit")
+        UserDetails admin= User.withUsername("Amit")
                 .password(passwordEncoder.encode("Pwd3"))
-                .roles("USER", "ADMIN").build();
+                .roles("MANAGER", "HR").build();
 
-        return new InMemoryUserDetailsManager(user, admin, userAdmin);
+        return new InMemoryUserDetailsManager(employee, admin, hr);
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http.authorizeRequests()
-                .antMatchers("/nonSecure").permitAll()
+//        return http.authorizeRequests()
+//                .antMatchers("/nonSecure").permitAll()
+//                .and()
+//                .authorizeRequests().antMatchers("/home", "/text")
+//                .authenticated().and().httpBasic().and().build();
+        return http.csrf().disable()
+                .authorizeRequests()
+                .antMatchers("/employees/welcome").permitAll()
                 .and()
-                .authorizeRequests().antMatchers("/home", "/text")
+                .authorizeRequests().antMatchers("/employees/**")
                 .authenticated().and().httpBasic().and().build();
     }
 
