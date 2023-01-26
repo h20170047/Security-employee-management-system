@@ -11,6 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/employees")
 public class EmployeeController {
+    public static final String AUTHORITY_ROLE_HR = "hasAuthority('ROLE_HR')";
     private EmployeeService employeeService;
 
     @Autowired
@@ -23,13 +24,12 @@ public class EmployeeController {
         return "Welcome to the portal! Your credentials have been shared over the mail";
     }
 
-    @PostMapping
-    @PreAuthorize("hasAuthority('ROLE_HR')")
+    @PostMapping("/create")
     public Employee onboardNewEmployee(@RequestBody Employee employee){
         return employeeService.createNewEmployee(employee);
     }
 
-    @GetMapping
+    @GetMapping("/all")
     @PreAuthorize("hasAuthority('ROLE_HR') or hasAuthority('ROLE_MANAGER')")
     public List<Employee> getAll(){
         return employeeService.getEmployees();
@@ -38,6 +38,12 @@ public class EmployeeController {
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('ROLE_EMPLOYEE')")
     public Employee getEmployeeById(@PathVariable Integer id){
-        return employeeService.getEmployeeById(id);
+        return employeeService.getEmployee(id);
+    }
+
+    @PutMapping("/update")
+    @PreAuthorize(AUTHORITY_ROLE_HR)
+    public Employee updateRoles(@RequestBody Employee employee){
+        return employeeService.changeEmployeeRole(employee);
     }
 }

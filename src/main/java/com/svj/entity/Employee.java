@@ -21,4 +21,7 @@ public class Employee {
     private String dept;
     private double salary;
     private String email;
+    private String userName;
+    private String password;
+    private String roles; // ROLE_HR , ROLE_MANAGER
 }
